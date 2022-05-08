@@ -1,3 +1,3 @@
-from .onlyoffice import (
+from .OnlyOffice import (
     OnlyOffice
     )

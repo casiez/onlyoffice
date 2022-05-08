@@ -10,8 +10,8 @@ Work in progress to provide a python API for the [OnlyOffice API](https://api.on
 ## Minimal example
 
 ```
-from onlyoffice import OnlyOffice
-oo = OnlyOffice('https://yourportal.onlyoffice.com', 'username', 'password')
+import onlyoffice
+oo = onlyoffice.OnlyOffice('https://yourportal.onlyoffice.com', 'username', 'password')
 # download file ID 123
 oo.download(['123'], 'file.zip')
 
