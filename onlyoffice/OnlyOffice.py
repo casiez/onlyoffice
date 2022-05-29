@@ -3,7 +3,7 @@
 
 import requests
 import json
-import shutil
+import time
 
 class OnlyOffice:
     username = ''
@@ -30,15 +30,41 @@ class OnlyOffice:
         self.auth = {'Authorization': j['response']['token']}
         return j
 
+    def downloadFile(self, fileid, filename:str):
+        r = requests.get('%s/Products/Files/HttpHandlers/filehandler.ashx?action=download&fileid=%s'%(self.baseurl, fileid), headers=self.auth)
+        open(filename, "wb").write(r.content)
+
+
+    # https://api.onlyoffice.com/portals/method/files/get/api/2.0/files/fileops
+    def getFileops(self):
+        finished = True
+        r = requests.get('%s/api/2.0/files/fileops'%(self.baseurl), headers=self.auth)
+        j = json.loads(r.text)     
+        for item in j['response']:
+            if not(item['finished']):
+                finished = False
+        return (finished, j)   
+
     # https://api.onlyoffice.com/portals/method/files/put/api/2.0/files/fileops/bulkdownload
-    def download(self, fileids: list, filename:str) -> None:
-        r = requests.put('%s/api/2.0/files/fileops/bulkdownload'%(self.baseurl), \
+    def download(self, fileids: list, filename:str):
+        r1 = requests.put('%s/api/2.0/files/fileops/bulkdownload'%(self.baseurl), \
             data={'fileIds': fileids}, headers=self.auth) 
 
-        r = requests.get('%s/Products/Files/HttpHandlers/filehandler.ashx?action=bulk&ext=.zip'%(self.baseurl), headers=self.auth, stream=True, allow_redirects=True)
+        # Wait for operation to finish, up to 120 s
+        i = 0
+        while (i < 60) and not(self.getFileops()[0]):
+            time.sleep(2)
+            print("Sleep %s"%i)
+            i += 1
 
-        with open(filename, 'wb') as f:
-            shutil.copyfileobj(r.raw, f)
+        if not(self.getFileops()[0]):
+            ok = False
+        else:
+            r = requests.get('%s/Products/Files/HttpHandlers/filehandler.ashx?action=bulk&ext=.zip'%(self.baseurl), headers=self.auth)
+            open(filename, "wb").write(r.content)
+            ok = True
+
+        return ok
 
     # https://api.onlyoffice.com/portals/method/files/post/api/2.0/files/%7bfolderid%7d/upload
     def upload(self, dirID: str, filename: str):
