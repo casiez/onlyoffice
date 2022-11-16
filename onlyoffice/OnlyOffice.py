@@ -66,6 +66,27 @@ class OnlyOffice:
 
         return ok
 
+    def download_folder(self, folderId: str, path = ''):
+        """
+        Quick'n'dirty func that allows to bulk download multiple files in a folder
+        :param folder_id: folderId number in OnlyOffice WS
+        https://api.onlyoffice.com/portals/method/files/get/api/2.0/files/%7bfolderid%7d
+        """
+        # Get file list in a folder
+        r1 = requests.get('%s/api/2.0/files/%s' % (self.baseurl, folderId), headers=self.auth)
+        j1 = json.loads(r1.text)
+        if (j1['count']) != 0:
+            for i in j1['response']['files']:
+                filename = i['title']
+                # Get a link to download the current file with the ID specified in the json payload
+                # https://api.onlyoffice.com/portals/method/files/get/api/2.0/files/file/%7bfileid%7d/presigneduri
+                r2 = requests.get('%s/api/2.0/files/file/%s/presigneduri' % (self.baseurl, i['id']), headers=self.auth)
+                j2 = json.loads(r2.text)
+                # Start the download process and bulk write output
+                r3 = requests.get(j2['response'], headers=self.auth)
+                open("%s%s"%(path, filename), "wb").write(r3.content)
+
+
     # https://api.onlyoffice.com/portals/method/files/post/api/2.0/files/%7bfolderid%7d/upload
     def upload(self, dirID: str, filename: str):
         with open(filename,'rb') as payload:

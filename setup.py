@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
      name='onlyoffice',  
-     version='0.0.3',
+     version='0.1.0',
      author="Géry Casiez",
      author_email="gery.casiez@gmail.com",
      description="Python API for OnlyOffice.",
