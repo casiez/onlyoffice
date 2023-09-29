@@ -1,5 +1,6 @@
 [![PyPI Version](https://img.shields.io/pypi/v/onlyoffice)](https://pypi.org/project/onlyoffice/)
 [![License](https://img.shields.io/github/license/casiez/onlyoffice)](LICENSE)
+[![Downloads](https://static.pepy.tech/badge/onlyoffice)](https://pepy.tech/project/onlyoffice)
 
 # onlyoffice
 
